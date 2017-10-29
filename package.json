@@ -1,0 +1,19 @@
+{
+    "name": "fcc.stocks",
+    "version": "1.0.0",
+    "description": "fcc stocks app",
+    "main": "./server/server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "bael",
+    "license": "MIT",
+    "dependencies": {
+        "dotenv": "^4.0.0",
+        "koa": "^2.3.0",
+        "koa-body": "^2.5.0",
+        "koa-convert": "^1.2.0",
+        "koa-router": "^7.2.1",
+        "koa-static": "^4.0.1"
+    }
+}
