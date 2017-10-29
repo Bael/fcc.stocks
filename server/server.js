@@ -6,6 +6,9 @@ const port = process.env.PORT || 3000;
 const path = require('path');
 const {routes, allowedMethods} = require('./routes/stocks');
 
+var http = require('http').createServer(app.callback());
+var io = require('socket.io')(http);
+
 //console.log(stocksRoute.stocksRoute());
 app.use(async (ctx, next) => {
     try {
@@ -19,6 +22,10 @@ app.use(async (ctx, next) => {
     }
   })
 
+
+  io.on('connection', function(socket){
+    console.log('a user connected');
+  });
 
 app.use(routes());
 app.use(allowedMethods());
@@ -47,4 +54,7 @@ app.use(async (ctx, next) => {
     ctx.body = 'Hello World!!!';
   });
 
-  app.listen(port);
+  http.listen(port, function(){
+    console.log('listening on *:'+port);
+  });
+  //app.listen(port);
