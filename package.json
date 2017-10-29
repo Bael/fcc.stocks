@@ -9,12 +9,14 @@
     "author": "bael",
     "license": "MIT",
     "dependencies": {
+        "async-request": "^1.2.0",
         "dotenv": "^4.0.0",
         "koa": "^2.3.0",
         "koa-body": "^2.5.0",
         "koa-convert": "^1.2.0",
         "koa-router": "^7.2.1",
         "koa-static": "^4.0.1",
+        "request": "^2.83.0",
         "socket.io": "^2.0.4"
     }
 }
