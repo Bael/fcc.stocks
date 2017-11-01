@@ -10,11 +10,15 @@ nv.addGraph(function() {
     ;
   
     chart.xAxis     //Chart x-axis settings
-        .axisLabel('Time (ms)')
-        .tickFormat(d3.format(',r'));
+        .axisLabel('Date')
+        .tickFormat(function(d) {
+            var dx = [d][0];
+            return d3.time.format('%x')(new Date(dx));
+        });
+
   
     chart.yAxis     //Chart y-axis settings
-        .axisLabel('Voltage (v)')
+        .axisLabel('USD')
         .tickFormat(d3.format('.02f'));
   
     /* Done setting the chart up? Time to render it!*/

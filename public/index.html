@@ -6,25 +6,126 @@
     <title>Stocks app</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" />
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
+        $(function() {
+
+            function fillGraph(data) {
+                /*d3.select('#chart svg')    //Select the <svg> element you want to render the chart in.
+                .datum(data)         //Populate the <svg> element with chart data...
+                .call(mychart);          //Finally, render the chart!
+                mychart.update();
+*/
+
+                    // Update the SVG with the new data and call chart
+                d3.select('#chart svg').datum(data).transition().duration(500).call(mychart);
+                    nv.utils.windowResize(mychart.update);
+            }
+
+            var mychart;
+
+            var data = [];
+
+            function buildGraph(chartData) {
+                /*These lines are all chart setup.  Pick and choose which chart features you want to utilize. */
+                nv.addGraph(function () {
+                    var chart = nv.models.lineChart()
+                        .options({duration: 500})
+                        .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+                        .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+                        .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                        .showYAxis(true)        //Show the y-axis
+                        .showXAxis(true)        //Show the x-axis
+                    ;
+
+                    chart.xAxis     //Chart x-axis settings
+                        .axisLabel('Date')
+                        .tickFormat(function (d) {
+                            var dx = [d][0];
+                            return d3.time.format('%x')(new Date(dx));
+                        });
+
+
+                    chart.yAxis     //Chart y-axis settings
+                        .axisLabel('USD')
+                        .tickFormat(d3.format('.02f'));
+
+                    /* Done setting the chart up? Time to render it!*/
+
+
+                    d3.select('#chart svg')    //Select the <svg> element you want to render the chart in.
+                        .datum(chartData)         //Populate the <svg> element with chart data...
+                        .call(chart);          //Finally, render the chart!
+
+                    //Update the chart when window resizes.
+                    nv.utils.windowResize(function () {
+                        chart.update()
+                    });
+                    mychart = chart;
+                    return chart;
+
+                });
+
+
+            };
+
+
+            var socket = io();
+
+
+            $('form').submit(function () {
+                console.log('lets submit');
+                socket.emit('addSymbol', $('#m').val());
+                $('#m').val('');
+                return false;
+            });
+
+            socket.on('symbolAdded', function (msg) {
+                console.log(msg);
+                $('#messages').append($('<li>').text(msg.key));
+                data.push(msg);
+                if (mychart) {
+                    fillGraph(data);
+                }
+                else {
+                    buildGraph(data);
+                }
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
     </script>
 </head>
 
 <body>
     <div class="container">
 
-        <!--
+
         <ul id="messages"></ul>
         <form action="">
             <input id="m" autocomplete="off" /><button>Send</button>
         </form>
-        -->
+
+
+        <div id="chart" class="is-fullwidth is-large">
+            <svg  height="1000" width="1000"  ></svg>
+        </div>
+
 
         <footer class="footer">
             <div class="container">

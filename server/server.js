@@ -5,7 +5,7 @@ const serve = require('koa-static');
 const port = process.env.PORT || 3000;
 const path = require('path');
 const {routes, allowedMethods} = require('./routes/stocks');
-
+const stocksProvider = require('./providers/stocks');
 var http = require('http').createServer(app.callback());
 var io = require('socket.io')(http);
 
@@ -23,8 +23,13 @@ app.use(async (ctx, next) => {
   })
 
 
-  io.on('connection', function(socket){
+  io.on('connection', async function(socket){
     console.log('a user connected');
+    socket.on('addSymbol', async function(msg){
+        console.log('add symbol called for '+msg);
+        let response = await stocksProvider.getStocksBySymbol(msg);
+        io.emit('symbolAdded', response);
+      });
   });
 
 app.use(routes());
