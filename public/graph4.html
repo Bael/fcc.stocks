@@ -43,14 +43,21 @@
                 <svg class="is-fullwidth is-large"></svg>
             </div>
         </div>
+        <div class="tags" id="messages">
+
+        </div>
+
+        <!--
         <ul id="messages"></ul>
+        -->
         <form action="">
             <div class="field has-addons">
                 <input id="m" autocomplete="off" /><button class="button is-success">Send</button>
             </div>
         </form>
 
-        <script defer>
+
+        <script>
             $(function() {
                 var socket = io();
 
@@ -85,8 +92,12 @@
                         });
 
                         function addSymbolToInterface(symbolKey) {
-                            $('#messages').append($('<li id="item' + symbolKey + '">').text(symbolKey));
-                            $('#item' + symbolKey).bind('click', function() {
+                            let str = '<span id="item' + symbolKey + '"class="tag is-success is-large">' +
+                                symbolKey + '<button id="itemBtn' + symbolKey + '" class="delete"></button></span>';
+
+
+                            $('#messages').append(str);
+                            $('#itemBtn' + symbolKey).bind('click', function() {
                                 socket.emit('removeSymbol', symbolKey);
                             });
                         }
