@@ -5,19 +5,26 @@
     "main": "./server/server.js",
     "scripts": {
         "start": "node ./server/server.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "mocha"
     },
     "author": "bael",
     "license": "MIT",
     "dependencies": {
         "async-request": "^1.2.0",
         "dotenv": "^4.0.0",
+        "expect.js": "^0.3.1",
         "koa": "^2.3.0",
         "koa-body": "^2.5.0",
         "koa-convert": "^1.2.0",
         "koa-router": "^7.2.1",
         "koa-static": "^4.0.1",
         "request": "^2.83.0",
-        "socket.io": "^2.0.4"
+        "socket.io": "^2.0.4",
+        "sqlite3": "^3.1.13"
+    },
+    "devDependencies": {
+        "expect": "^21.2.1",
+        "mocha": "^4.0.1",
+        "supertest": "^3.0.0"
     }
 }

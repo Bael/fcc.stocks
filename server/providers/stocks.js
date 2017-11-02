@@ -1,7 +1,6 @@
 const request = require('async-request');
 require('dotenv').config();
-
-
+const symbols = require('../providers/symbol');
 
 
 async function getStocksBySymbol(symbol) {
@@ -36,4 +35,48 @@ async function getStocksBySymbol(symbol) {
 }
 
 
+async function getCurrentStocks() {
+        let response = [];
+        
+        let currentStocks = await symbols.getSymbols();
+
+        for (var i=0; i<currentStocks.length; i++) {
+            let symbolData = await getStocksBySymbol(currentStocks[i]);
+            response.push(symbolData);
+        }
+        
+    
+    return response;
+}
+    
+
+async function addSymbol(symbol) {
+    let symbolData = {};
+
+    try {
+        let symbolid = await symbols.addSymbol(symbol);
+        console.log("symbol added " + symbol);
+
+        symbolData = await getStocksBySymbol(symbol);
+
+    
+    }
+    catch (e) {
+        console.log(e);
+        throw e;
+    }
+    return symbolData;
+}
+
+
+async function removeSymbol(symbol) {
+    
+    await symbols.removeSymbol(symbol);
+    
+    return true;
+}
+
 module.exports.getStocksBySymbol = getStocksBySymbol;
+module.exports.getCurrentStocks = getCurrentStocks;
+module.exports.addSymbol = addSymbol;
+module.exports.removeSymbol = removeSymbol;

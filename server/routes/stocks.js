@@ -11,9 +11,8 @@ const koaBody = convert(KoaBody());
 
 router
   .get('/', async (ctx, next) => {
-    let resp = await stocksProvider.getStocksBySymbol("MSFT");
-    ctx.body = [resp];
-
+    let resp = await stocksProvider.getCurrentStocks();
+    ctx.body = resp;
   })
   
 

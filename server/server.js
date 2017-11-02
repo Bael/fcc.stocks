@@ -27,12 +27,14 @@ app.use(async (ctx, next) => {
     console.log('a user connected');
     socket.on('addSymbol', async function(msg){
         console.log('add symbol called for '+msg);
-        let response = await stocksProvider.getStocksBySymbol(msg);
+        let response = await stocksProvider.addSymbol(msg);
         io.emit('symbolAdded', response);
       });
 
     socket.on('removeSymbol', async function(msg) {
       console.log('removeSymbol ' + msg);
+      await stocksProvider.removeSymbol(msg);
+      console.log('removeSymbol executed ' + msg);
       io.emit('symbolRemoved', msg)
     });
   });
@@ -60,9 +62,7 @@ app.use(async (ctx, next) => {
   app.use(serve(path.join(__dirname,'../public')));
   // response
   
-  app.use(async ctx => {
-    ctx.body = 'Hello World!!!';
-  });
+
 
   http.listen(port, function(){
     console.log('listening on *:'+port);

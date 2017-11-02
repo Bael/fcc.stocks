@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="chart.js"></script>
 </head>
 
 
@@ -42,265 +43,78 @@
                 <svg class="is-fullwidth is-large"></svg>
             </div>
         </div>
-
-
         <ul id="messages"></ul>
         <form action="">
-            <input id="m" autocomplete="off" /><button>Send</button>
+            <div class="field has-addons">
+                <input id="m" autocomplete="off" /><button class="button is-success">Send</button>
+            </div>
         </form>
 
-
-        <div class="field has-addons">
-            <div class="control">
-                <input class="input" id="stockname" type="text" placeholder="Enter a stock symbol">
-            </div>
-            <a class="button is-success" id="addBtn">
-                <span class="icon is-small">
-                        <i class="fa fa-check"></i>
-                    </span>
-                <span>Add</span>
-            </a>
-
-
-
-
-
-        </div>
-
-
-        </section>
-
-        <script>
+        <script defer>
             $(function() {
                 var socket = io();
-                let updateData = buildGraph();
 
-                $('form').submit(function() {
-                    console.log('lets submit');
-                    socket.emit('addSymbol', $('#m').val());
-                    $('#m').val('');
-                    return false;
-                });
-
-                let chartsData = [];
-
-                socket.on('symbolAdded', function(msg) {
-                    console.log(msg);
-                    $('#messages').append($('<li id="item' + msg.key + '">').text(msg.key));
-                    $('#item' + msg.key).bind('click', function() {
-                        socket.emit('removeSymbol', msg.key);
-                    });
-
-                    chartsData.push(msg);
-                    chart.updateData(chartsData);
-                    //addSymbolToGraph(msg);
-
-                });
-
-                socket.on('symbolRemoved', function(msg) {
-                    console.log('symbolRemoved' + msg);
-                    $('#item' + msg).remove();
-                    console.log('removed');
-                    chartsData = chartsData.filter(function(obj) {
-                        return obj.key != msg;
-                    });
-
-
-                    chart.updateData(chartsData);
-                    //addSymbolToGraph(msg);
-
-                });
-
-
-                function buildGraph() {
-                    // Set the dimensions of the canvas / graph
-
-
-                    let margin = {
+                let sizes = {
+                    margin: {
                         top: 30,
                         right: 20,
                         bottom: 30,
                         left: 50
-                    };
-                    let width = 1000 - margin.left - margin.right;
-                    let height = 500 - margin.top - margin.bottom;
+                    },
+                    width: 1000,
+                    height: 500
+                };
 
+                // initial load
+                d3.json("/stocks", function(error, data) {
+                    if (error) {
+                        throw error
+                    } else {
+                        let chart = buildGraph(sizes, data);
 
-                    // Parse the date / time
-                    let xScale = d3.time.scale().range([0, width]);
-                    let yScale = d3.scale.linear().range([height, 0]);
-
-
-
-                    // Define the axes
-                    let xAxis = d3.svg.axis().scale(xScale)
-                        .orient("bottom").ticks(5);
-
-                    let yAxis = d3.svg.axis().scale(yScale)
-                        .orient("left").ticks(5);
-
-                    // Define the line
-                    let stocksline = d3.svg.line()
-                        .x(function(d) {
-                            return xScale(d.x);
-                        })
-                        .y(function(d) {
-                            return yScale(d.y);
+                        data.forEach(function(symbolData) {
+                            addSymbolToInterface(symbolData.key);
                         });
 
 
-                    // Adds the svg canvas
-                    let svg = d3.select("body")
-                        .append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .append("g")
-                        .attr("transform",
-                            "translate(" + margin.left + "," + margin.top + ")");
+                        $('form').submit(function() {
 
-                    // Scale the range of the data
-
-                    function prepareAggregateDataValues(data) {
-                        let aggregatedDataValues = data.reduce(function(acc, currentElement) {
-                            return [...acc, ...currentElement.values];
-                        }, []).map(d => {
-                            return {
-                                x: new Date(d.x),
-                                y: +d.y
-                            }
+                            socket.emit('addSymbol', $('#m').val());
+                            $('#m').val('');
+                            return false;
                         });
 
-                        return aggregatedDataValues;
-
-                    }
-
-
-                    d3.json("/stocks", function(error, data) {
-                        if (error) {
-                            throw error
-                        } else {
-                            chartsData = data;
-                            aggregatedDataValues = prepareAggregateDataValues(data);
-
-                            console.log("aggregatedDataValues" + aggregatedDataValues);
-                            console.log(aggregatedDataValues);
-
-                            xScale.domain(d3.extent(aggregatedDataValues, function(d) {
-                                return d.x;
-                            }));
-
-                            yScale.domain(d3.extent(aggregatedDataValues, function(d) {
-                                return d.y;
-                            }));
-
-
-                            data.forEach(function(d) {
-                                console.log(d.key);
-
-                                d.values.forEach(value => {
-                                    value.x = new Date(value.x)
-                                    value.y = +value.y;
-                                })
-
-                                svg.append("path")
-                                    .attr("class", "line")
-                                    .style("stroke", "black")
-                                    .attr("d", stocksline(d.values));
+                        function addSymbolToInterface(symbolKey) {
+                            $('#messages').append($('<li id="item' + symbolKey + '">').text(symbolKey));
+                            $('#item' + symbolKey).bind('click', function() {
+                                socket.emit('removeSymbol', symbolKey);
                             });
-
-                            // Add the X Axis
-                            svg.append("g")
-                                .attr("class", "x axis")
-                                .attr("transform", "translate(0," + height + ")")
-                                .call(xAxis);
-
-                            // Add the Y Axis
-                            svg.append("g")
-                                .attr("class", "y axis")
-                                .call(yAxis);
-
-
                         }
-                    });
 
-
-
-                    let updateData = function(updateData) {
-
-                        let aggregatedDataValues = prepareAggregateDataValues(updateData);
-
-                        xScale.domain(d3.extent(aggregatedDataValues, function(d) {
-                            return d.x;
-                        }));
-
-                        yScale.domain(d3.extent(aggregatedDataValues, function(d) {
-                            return d.y;
-                        }));
-
-
-                        svg.selectAll("path").remove();
-
-                        updateData.forEach(function(d) {
-                            console.log(d.key);
-
-                            d.values.forEach(value => {
-                                value.x = new Date(value.x)
-                                value.y = +value.y;
-                            })
-
-                            svg.append("path")
-                                .attr("class", "line")
-
-                            .attr("d", stocksline(d.values));
+                        socket.on('symbolAdded', function(symbolData) {
+                            console.log(symbolData);
+                            addSymbolToInterface(symbolData.key);
+                            chart.addSymbol(symbolData);
                         });
 
 
-                        svg.selectAll("g.y.axis")
-                            .call(yAxis);
 
-                        svg.selectAll("g.x.axis")
-                            .call(xAxis);
-
-
+                        socket.on('symbolRemoved', function(symbolKey) {
+                            console.log('symbolRemoved' + symbolKey);
+                            $('#item' + symbolKey).remove();
+                            console.log('removed');
+                            chart.removeSymbolByKey(symbolKey);
+                        });
 
                     }
-
-                    return {
-                        updateData: updateData
-                    };
-                }
+                });
 
 
-
-
-                function addSymbolToGraph() {
-
-                }
-
-                function removeSymbolToGraph() {
-
-                }
 
 
             });
         </script>
 
-        <script>
-            var dataset;
 
-            function buildGraphic() {
-                // load current
-                // remove
-                // add
-
-
-
-            };
-
-
-            $("#addBtn").bind("click", function() {
-                $("tags")
-            });
-        </script>
 
 </body>
