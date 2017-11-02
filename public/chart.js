@@ -20,8 +20,10 @@ function buildGraph(sizes, initialData) {
 
 
     // Define the axes
+    let xTicksCount = width / 100;
+
     let xAxis = d3.svg.axis().scale(xScale)
-        .orient("bottom").ticks(7);
+        .orient("bottom").ticks(xTicksCount);
 
     let yAxis = d3.svg.axis().scale(yScale)
         .orient("left").ticks(10);

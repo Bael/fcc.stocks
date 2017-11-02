@@ -5,20 +5,40 @@
         /* set the CSS */
         
         svg {
-            max-height: 100%;
-            position: absolute;
-            top: 5%;
-            height: 80%;
+            max-height: 90%;
+            display: inline-block;
+            width: 100%;
+            height: 90%;
+            /*position: absolute;
+            top: 40px;
+            
+            
+            height: 80%;*/
         }
         
         body {
             font: 12px Arial;
         }
         
+        .footer {
+            bottom: 0;
+            width: 100%;
+            position: absolute;
+        }
+        
         path {
             stroke: steelblue;
             stroke-width: 2;
             fill: none;
+        }
+        
+        .svg-container {
+            position: absolute;
+            top: 40;
+            bottom: 80;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
         
         line {
@@ -50,66 +70,51 @@
 <body>
 
 
-    <div class="container">
+    <nav class="navbar is-success" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item is-active" title="Open github page" href="https://github.com/Bael/fcc.stocks" target="_blank">
+                        Stocks App <i class="fa fa-github"></i>
+            </a>
 
+        </div>
 
-        <section class="hero  is-large">
-            <div class="hero-head">
-                <nav class="navbar">
-                    <div class="container is-fullwidth">
-                        <form action="">
-                            <div class="field has-addons is-fullwidth">
-                                <input id="m" autocomplete="off" placeholder="Enter symbol and click OK" /><button class="button is-success">Send</button>
-                            </div>
-                        </form>
-                        <div class="tags" id="messages">
-
-                        </div>
-
-
-                        <div id="navbarMenuHeroB" class="navbar-menu">
-                            <div class="navbar-end">
-                                <a class="navbar-item is-active">
-                                        Stocks App
-                                    </a>
-                            </div>
-                        </div>
+        <div class="navbar-item">
+            <div class="container level">
+                <form action="" class="level-item">
+                    <div class="field has-addons is-fullwidth">
+                        <input id="m" autocomplete="off" placeholder="Enter symbol and click Add" /><button class="button is-warning">Add</button>
                     </div>
-                </nav>
-            </div>
-
-            <div class="hero-body is-success">
-                <div>
-
-
-                    <div id="chart">
-                        <svg></svg>
-                    </div>
-
-                    <!--
-                                        <ul id="messages"></ul>
-                                        -->
+                </form>
+                <div class="tags" id="messages">
 
                 </div>
-
             </div>
+        </div>
+    </nav>
 
-            <div class="hero-foot">
-                <nav class="tabs is-boxed is-fullwidth">
-                    <div class="container">
-                        <div class="content has-text-centered">
-                            <span>This "night life" app is built by <a href="https://www.freecodecamp.org/bael" target="_blank">@bael</a> of freecodecamp, </span>
-                            <span>as solution to challenge <a href="https://www.freecodecamp.org/challenges/build-a-nightlife-coordination-app" target="_blank">build night life coordination app</a></span>
-                            <span>Github: <a href="https://github.com/Bael/fcc.stocks" target="_blank">Bael/fcc.stocks<i class="fa fa-github"></i></a>
+
+
+    <div class="svg-container" id="chart">
+        <svg></svg>
+    </div>
+
+
+    <!--div class="footer">
+
+
+        <div class="content has-text-centered">
+            <span>This "Chart the Stock Market" app is built by <a href="https://www.freecodecamp.org/bael" target="_blank">@bael</a> of freecodecamp, </span>
+            <span>as solution to <a href="https://www.freecodecamp.org/challenges/chart-the-stock-market" target="_blank">fcc challenge</a></span>
+            <span>Github: <a href="https://github.com/Bael/fcc.stocks" target="_blank">Bael/fcc.stocks<i class="fa fa-github"></i></a>
                                         </span>
 
-                        </div>
-                    </div>
-                </nav>
-            </div>
-        </section>
+        </div>
 
-    </div>
+
+    </div-->
+
+
+
 
     <script>
         $(function() {
@@ -122,9 +127,14 @@
                     bottom: 30,
                     left: 50
                 },
-                width: 1000,
-                height: 500
+                width: window.innerWidth,
+                height: window.innerHeight * 0.8
             };
+
+            $(window).resize(function() {
+                $("svg").attr("width", window.innerWidth);
+                $("svg").attr("height", window.innerHeight);
+            });
 
             // initial load
             d3.json("/stocks", function(error, data) {
@@ -146,7 +156,7 @@
                     });
 
                     function addSymbolToInterface(symbolKey) {
-                        let str = '<span id="item' + symbolKey + '"class="tag is-success is-large">' +
+                        let str = '<span id="item' + symbolKey + '"class="tag is-warning is-large">' +
                             symbolKey + '<button id="itemBtn' + symbolKey + '" class="delete"></button></span>';
 
 
