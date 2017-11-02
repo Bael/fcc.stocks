@@ -30,6 +30,11 @@ app.use(async (ctx, next) => {
         let response = await stocksProvider.getStocksBySymbol(msg);
         io.emit('symbolAdded', response);
       });
+
+    socket.on('removeSymbol', async function(msg) {
+      console.log('removeSymbol ' + msg);
+      io.emit('symbolRemoved', msg)
+    });
   });
 
 app.use(routes());

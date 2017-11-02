@@ -3,6 +3,7 @@ require('dotenv').config();
 
 
 
+
 async function getStocksBySymbol(symbol) {
 
     let response;
@@ -21,7 +22,7 @@ async function getStocksBySymbol(symbol) {
         let values = [];
         Object.getOwnPropertyNames(series).sort().forEach(function(val, idx, array) {
             console.log(val + ' -> ' + series[val]);
-            values.push({x:new Date(val).getTime(), y:series[val]["4. close"]});
+            values.push({x:val, y:series[val]["4. close"]});
           });
 
         response = {values, key:symbol, color:"#0000ff"};
