@@ -7,6 +7,7 @@
         "start": "node ./server/server.js",
         "test": "mocha"
     },
+    "engines": { "node": ">=8.12" },
     "author": "bael",
     "license": "MIT",
     "dependencies": {
