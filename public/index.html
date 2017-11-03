@@ -172,6 +172,11 @@
                         chart.addSymbol(symbolData);
                     });
 
+                    socket.on('symbolIsWrong', function(errorSymbol) {
+                        console.log(errorSymbol);
+                        alert('Sorry, but Symbol ' + errorSymbol + ' does not exists');
+                    });
+
 
 
                     socket.on('symbolRemoved', function(symbolKey) {

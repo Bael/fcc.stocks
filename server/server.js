@@ -26,9 +26,16 @@ app.use(async (ctx, next) => {
   io.on('connection', async function(socket){
     console.log('a user connected');
     socket.on('addSymbol', async function(msg){
-        console.log('add symbol called for '+msg);
-        let response = await stocksProvider.addSymbol(msg);
-        io.emit('symbolAdded', response);
+
+        try {
+          console.log('add symbol called for '+msg);
+          let response = await stocksProvider.addSymbol(msg);
+          io.emit('symbolAdded', response);
+        }
+        catch (e) {
+          console.log('catched error! ' + msg);
+           io.emit('symbolIsWrong', msg); 
+        }
       });
 
     socket.on('removeSymbol', async function(msg) {

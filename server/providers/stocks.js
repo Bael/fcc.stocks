@@ -15,6 +15,11 @@ async function getStocksBySymbol(symbol) {
         let raw = await request(baseUrl);
 
         let jsonBody = JSON.parse(raw.body)
+        console.log(jsonBody);
+        if (jsonBody.hasOwnProperty('Error Message'))
+        {
+            throw new Error('wrong symbol!');
+        }
         let series = jsonBody["Time Series (Daily)"];
         //console.log(jsonBody);
         //console.log(series);
@@ -28,6 +33,7 @@ async function getStocksBySymbol(symbol) {
 
     } catch (e) {
         console.log(e);
+        throw e;
     }
 
     return response;
@@ -54,10 +60,11 @@ async function addSymbol(symbol) {
     let symbolData = {};
 
     try {
+        
+        symbolData = await getStocksBySymbol(symbol);
+
         let symbolid = await symbols.addSymbol(symbol);
         console.log("symbol added " + symbol);
-
-        symbolData = await getStocksBySymbol(symbol);
 
     
     }
